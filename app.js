@@ -4,35 +4,70 @@ let costPerTube = 7; // Cost per tube in USD
 let tubesPerUnits = 4; // Number of units in the classroom
 let unitsPerClassroom = 4; // Number of units in the classroom
 
-const averageHoursPerTubePerYear = Math.round(
-	hoursPerClass / (tubesPerUnits * unitsPerClassroom)
-); // 2700 hours / 16 tubes = 169 hours per tube per year in average
-
 // function to get a random number between 100 and 200
 function rand() {
 	return Math.floor(Math.random() * (200 - 100 + 1) + 100);
 }
 
+function generateTubes(quantity, isNew, oldTubes = [], tubesBroken = []) {
+	let tubesNew = [];
+
+	if (isNew) {
+		tubesNew = Array.from({ length: quantity }, () => rand());
+	} else {
+		tubesNew = oldTubes.map((tube) => {
+			if (tubesBroken.includes(tube)) {
+				return rand();
+			}
+			return tube;
+		});
+	}
+
+	return tubesNew;
+}
+
 // function to calculate the number of broken tubes in a year
 function calculateBrokenTubes() {
 	let brokenTubes = 0;
-	for (let i = 0; i < classRoomQuantity; i++) {
-		// loop through the 4 units
-		for (let j = 0; j < unitsPerClassroom; j++) {
-			// get the number of hours for each tube
-			let tubes = Array.from({ length: tubesPerUnits }, () => rand());
-			// filter the tubes that are broken
-			let broken = tubes.filter(
-				(tube) => tube < averageHoursPerTubePerYear
-			);
+	let tubes;
+	let tubesCopy;
 
-			if (broken.length >= 2) {
-				brokenTubes += 4;
-			} else {
+	function copyTubes(tubes) {
+		tubesCopy = tubes.slice();
+	}
+
+	// loop through the units in the classroom
+	for (let unit = 1; unit <= unitsPerClassroom; unit++) {
+		tubes = generateTubes(tubesPerUnits, true); // Generate tubes for the unit
+		let tubesBroken = []; // Array to store the tubes that are broken
+		copyTubes(tubes); // Copy the tubes array to keep track of the tubes that are broken
+
+		// Loop through the hours of the class
+		for (let hour = 0; hour < hoursPerClass; hour++) {
+			let brokenFlag = 0;
+
+			// Reduce the life of each tube
+			for (let i = 0; i < tubesPerUnits; i++) {
+				tubes[i]--;
+				if (tubes[i] <= 0) {
+					brokenFlag++;
+					tubesBroken.push(tubesCopy[i]); // Add the broken tube to the array of broken tubes to replace them later
+				}
+			}
+
+			// Check if the unit has 2 or more broken tubes
+			if (brokenFlag >= 2) {
+				brokenTubes += 2;
+				tubes = generateTubes(tubesPerUnits, true); // Generate new tubes for the unit
+				copyTubes(tubes); // Copy the tubes array to keep track of the tubes that are broken
+			} else if (brokenFlag == 1) {
 				brokenTubes += 1;
+				tubes = generateTubes(1, false, tubesCopy, tubesBroken); // Generate new tubes for the unit
+				copyTubes(tubes); // Copy the tubes array to keep track of the tubes that are broken
 			}
 		}
 	}
+
 	return brokenTubes;
 }
 
