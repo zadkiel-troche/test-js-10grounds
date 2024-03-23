@@ -3,6 +3,7 @@ let classRoomQuantity = 1; // 1 classroom
 let costPerTube = 7; // Cost per tube in USD
 let tubesPerUnits = 4; // Number of units in the classroom
 let unitsPerClassroom = 4; // Number of units in the classroom
+let costoInicial = unitsPerClassroom * tubesPerUnits * costPerTube; // Initial cost of the tubes
 
 // function to get a random number between 100 and 200
 function rand() {
@@ -77,7 +78,7 @@ let countBrokenTubes = calculateBrokenTubes();
 
 // function to calculate the cost of the tubes in a year
 function tubesCost() {
-	return countBrokenTubes * costPerTube;
+	return costoInicial + countBrokenTubes * costPerTube;
 }
 
 // calculate the cost of the tubes per year
