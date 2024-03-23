@@ -9,6 +9,7 @@ function rand() {
 	return Math.floor(Math.random() * (200 - 100 + 1) + 100);
 }
 
+// function to generate tubes for the units in the classroom
 function generateTubes(quantity, isNew, oldTubes = [], tubesBroken = []) {
 	let tubesNew = [];
 
